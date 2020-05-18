@@ -1,0 +1,16 @@
+.vagrant
+node_modules
+venv*
+opevpn/group_by_country/*
+openvpn/nordvpn/**
+openvpn/sorted/**
+terraform.*
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+.vscode
+__pycache__
+venv*
+.DS_Store
