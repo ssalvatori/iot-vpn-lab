@@ -1,0 +1,19 @@
+---
+- name: dnsmasq
+  listen: restart dnsmasq
+  systemd:
+    name: dnsmasq
+    state: restarted
+    enabled: yes
+
+- name: hostapd
+  listen: restart hostapd
+  systemd:
+    name: hostapd
+    state: restarted
+    enabled: yes
+    masked: no
+
+- name: netfilter-netfilter save
+  listen: save iptables
+  command: netfilter-persistent save

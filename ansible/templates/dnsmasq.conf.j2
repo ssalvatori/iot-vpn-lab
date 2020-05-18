@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+domain-needed
+bogus-priv
+
+interface=wlan0
+dhcp-range={{ net|ipaddr(12)|ipaddr('ip') }},{{ net|ipaddr(20)|ipaddr('ip')  }},{{ net|ipaddr('netmask')|ipaddr('ip') }},24h
+bind-interfaces
+
+domain=vpn
+
+dhcp-option=6,8.8.8.8,1.1.1.1,8.8.4.4

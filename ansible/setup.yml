@@ -1,0 +1,117 @@
+---
+- name: setup raspberry pi
+  hosts: all
+  gather_facts: False
+  become: yes
+
+  pre_tasks:
+
+    - name: check ssid username
+      fail: msg="SSID_NAME is not defined"
+      when: (ssid.name is not defined) or (ssid.name|length == 0)
+
+    - name: check ssid passpharse
+      fail: msg="SSID_PASSPHARSE is not defined"
+      when: (ssid.passpharse is not defined) or (ssid.passpharse|length == 0)
+
+    - name: check ssid country code
+      fail: msg="SSID_COUNTRY_CODE is not defined"
+      when: (ssid.country_code is not defined) or (ssid.country_code|length == 0)
+
+    - name: check nordvpn username
+      fail: msg="NORDVPN_USERNAME is not defined"
+      when: (openvpn_credentials.user is not defined) or (openvpn_credentials.user|length == 0)
+
+    - name: check nordvpn password
+      fail: msg="NORDVPN_PASSWORD is not defined"
+      when: (openvpn_credentials.password is not defined) or (openvpn_credentials.password|length == 0)     
+
+  tasks:
+    - name: Install packages
+      apt:
+        pkg: "{{ packages }}"
+        state: present
+
+    - name: "Create {{ nordvpn_mgn_path }}"
+      file:
+        path: "{{ nordvpn_mgn_path }}"
+        state: directory
+
+    - name: Copy nordvpn-conf-manager
+      template:
+        src: templates/nordvpn_conf.sh.j2
+        dest: "{{ nordvpn_mgn_path }}/nordvpn_conf.sh"
+        mode: 0755
+
+    - name: Creating NORDVPN credentials file
+      template:
+        src: templates/nordvpn_credentials.j2
+        dest: "{{ openvpn_credentials.path }}"
+        mode: 0644
+
+    - name: Setup nordvpn-conf-manager
+      cron:
+        name: "check dirs"
+        minute: "0"
+        hour: "0"
+        job: "/bin/bash {{ nordvpn_mgn_path }}/nordvpn_conf.sh > {{ nordvpn_mgn_path }}/nordvpn_conf.log"
+
+    - name: setup /etc/dhcpcd.conf
+      template:
+        src: templates/dhcpcd.conf.j2
+        dest: /etc/dhcpcd.conf
+
+    - name: setup wlan0 interfaces
+      template:
+        src: templates/wlan0_interfaces.j2
+        dest: /etc/network/interfaces.d/wlan0
+
+    - name: setup /etc/dnsmasq.conf
+      template:
+        src: templates/dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+      notify:
+        - restart dnsmasq
+
+    - name: setup /etc/hostapd/hostapd.conf
+      template:
+        src: templates/hostapd.conf.j2
+        dest: /etc/hostapd/hostapd.conf
+      notify:
+        - restart hostapd
+
+    - name: setup /etc/default/hostapd
+      lineinfile:
+        dest: /etc/default/hostapd
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      with_items:
+        - { regexp: "^#DAEMON_CONF=\"\"$", line: "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"" }
+      notify:
+        - restart hostapd
+
+    - name: Enable routing and masquerading
+      template:
+        src: templates/routed-ap.conf.j2
+        dest: /etc/sysctl.d/routed-ap.conf
+        owner: root
+        group: root
+
+    - name: Create Iptables NAT eth0
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: eth0
+        jump: MASQUERADE
+        comment: Ansible NAT
+      notify: save iptables
+
+    - name: Create Iptables NAT tun0
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: tun0
+        jump: MASQUERADE
+        comment: Ansible NAT
+      notify: save iptables

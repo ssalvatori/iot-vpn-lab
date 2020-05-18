@@ -1,0 +1,7 @@
+# {{ ansible_managed }}
+
+allow-hotplug wlan0
+
+iface wlan0 inet static
+  address {{ net|ipaddr(11)|ipaddr('ip') }}
+  netmask 255.255.255.0

@@ -1,0 +1,23 @@
+---
+packages:
+  - virtualenv
+  - build-essential
+  - python3-dev
+  - libdbus-glib-1-dev
+  - libgirepository1.0-dev
+  - hostapd
+  - dnsmasq
+  - netfilter-persistent
+  - iptables-persistent
+  - iptables
+net: 10.10.0.10/24
+ssid: 
+  name: "{{ lookup('env', 'SSID_NAME') }}"
+  passpharse: "{{ lookup('env', 'SSID_PASSPHARSE') }}"
+  country_code: "{{ lookup('env', 'SSID_COUNTRY_CODE') }}"
+openvpn_credentials:
+  user: "{{ lookup('env', 'NORDVPN_USERNAME') }}"
+  password: "{{ lookup('env', 'NORDVPN_PASSWORD') }}"
+  path: "/etc/openvpn/client/nordvpn-credentials.txt"
+
+nordvpn_mgn_path: /opt/vpn-lab
