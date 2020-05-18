@@ -4,6 +4,33 @@
   gather_facts: False
   become: yes
 
+  handlers:
+    - name: dnsmasq
+      listen: "restart dnsmasq"
+      systemd:
+        name: dnsmasq
+        state: restarted
+        enabled: yes
+
+    - name: hostapd
+      listen: "restart hostapd"
+      systemd:
+        name: hostapd
+        state: restarted
+        enabled: yes
+        masked: no
+
+    - name: netfilter-netfilter save
+      listen: "save iptables"
+      command: netfilter-persistent save
+
+    - name: reload systemctl
+      listen: "iot vpn lab"
+      systemd:
+        name: iot_lab_vpn
+        state: restarted
+        enabled: yes
+
   pre_tasks:
 
     - name: check ssid username
@@ -32,15 +59,22 @@
         pkg: "{{ packages }}"
         state: present
 
-    - name: "Create {{ nordvpn_mgn_path }}"
+    - name: "Create {{ iot_vpn_lab }}"
       file:
-        path: "{{ nordvpn_mgn_path }}"
+        path: "{{ item }}"
         state: directory
+      with_items:
+        - "{{ iot_vpn_lab }}"
+        - "{{ iot_vpn_lab }}/venv"
+        - "{{ iot_vpn_lab }}/src"
+        - "{{ iot_vpn_lab }}/nordvpn"
+        - "{{ iot_vpn_lab }}/aws"
+      notify: iot_vpn_lab
 
     - name: Copy nordvpn-conf-manager
       template:
         src: templates/nordvpn_conf.sh.j2
-        dest: "{{ nordvpn_mgn_path }}/nordvpn_conf.sh"
+        dest: "{{ iot_vpn_lab }}/nordvpn_conf.sh"
         mode: 0755
 
     - name: Creating NORDVPN credentials file
@@ -54,7 +88,7 @@
         name: "check dirs"
         minute: "0"
         hour: "0"
-        job: "/bin/bash {{ nordvpn_mgn_path }}/nordvpn_conf.sh > {{ nordvpn_mgn_path }}/nordvpn_conf.log"
+        job: "/bin/bash {{ iot_vpn_lab }}/nordvpn_conf.sh > {{ iot_vpn_lab }}/nordvpn_conf.log"
 
     - name: setup /etc/dhcpcd.conf
       template:
@@ -115,3 +149,51 @@
         jump: MASQUERADE
         comment: Ansible NAT
       notify: save iptables
+
+    - name: Setup systemd iot_vpn_lab
+      template:
+        src: templates/iot_vpn_lab.service.j2
+        dest: /etc/systemd/system/iot_vpn_lab.service
+        mode: 0644
+      notify:
+        - iot vpn lab
+      tags:
+        - iot_vpn_lab
+
+    - name: Copy aws certs
+      synchronize:
+        src: files/aws/
+        dest: "{{ iot_vpn_lab }}/aws/"
+      notify:
+        - iot vpn lab
+      tags:
+        - iot_vpn_lab
+
+    - name: Copy iot_vpn_lab python script
+      unarchive:
+        src: files/iot_vpn_lab.zip
+        dest: "{{ iot_vpn_lab }}/src/"
+        remote_src: no
+      notify:
+        - iot vpn lab
+      tags:
+        - iot_vpn_lab
+
+    - name: Creating configuration for iot_vpn_lab service
+      template:
+        src: templates/default_env.j2
+        dest: /etc/default/iot_vpn_lab
+      notify:
+        - iot vpn lab
+      tags:
+        - iot_vpn_lab
+
+    - name: Install requirements for iot_vpn_lab
+      pip:
+        requirements: "{{ iot_vpn_lab }}/src/requirements.txt"
+        virtualenv: "{{ iot_vpn_lab }}/venv"
+        virtualenv_python: python3
+      notify:
+        - iot vpn lab
+      tags:
+        - iot_vpn_lab

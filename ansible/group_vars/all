@@ -20,4 +20,4 @@ openvpn_credentials:
   password: "{{ lookup('env', 'NORDVPN_PASSWORD') }}"
   path: "/etc/openvpn/client/nordvpn-credentials.txt"
 
-nordvpn_mgn_path: /opt/vpn-lab
+iot_vpn_lab: /opt/iot_vpn_lab

@@ -1,0 +1,11 @@
+# {{ ansible_managed }}
+
+PYTHONUNBUFFERED=1
+AWS_ROOT_CA="{{ iot_vpn_lab }}/aws/AmazonRootCA1.pem"
+AWS_THING_PRIVATE_KEY="{{ iot_vpn_lab }}/aws/private_key.pem"
+AWS_THING_CERT="{{ iot_vpn_lab }}/aws/cert.pem"
+AWS_THINS_ATS_PORT="8883"
+AWS_THINS_ATS_ENDPOINT="a3vicmxba62vud-ats.iot.eu-central-1.amazonaws.com"
+AWS_THING_NAME="rbpi-lab"
+NORDVPN_CONFS_PATH="/vagrant/openvpn/group_by_country"
+NORDVPN_CREDENTIALS="{{ openvpn_credentials.path }}"

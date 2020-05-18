@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+
+[Unit]
+Description=IoT VPN Lab
+After=network.target
+
+[Service]
+User=root
+Group=root
+EnvironmentFile=/etc/default/iot_vpn_lab
+ExecStart={{ iot_vpn_lab }}/venv/bin/python3 {{ iot_vpn_lab }}/src/run.py
+PIDFile=/run/iot_vpn_lab.pid
+Restart=always
+Type=notify
+
+[Install]
+WantedBy=default.target
