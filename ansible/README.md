@@ -20,6 +20,12 @@ NORDVPN_USERNAME
 NORDVPN_PASSWORD
 ```
 
+### AWS IoT
+```
+AWS_ATS_ENDPOINT
+AWS_THING_NAME
+```
+
 ## Run ansible
 ```
 python3 -m venv venv

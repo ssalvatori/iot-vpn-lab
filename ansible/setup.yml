@@ -27,9 +27,11 @@
     - name: reload systemctl
       listen: "iot vpn lab"
       systemd:
-        name: iot_lab_vpn
+        name: iot_vpn_lab
         state: restarted
         enabled: yes
+      tags:
+        - iot_vpn_lab
 
   pre_tasks:
 
@@ -52,6 +54,14 @@
     - name: check nordvpn password
       fail: msg="NORDVPN_PASSWORD is not defined"
       when: (openvpn_credentials.password is not defined) or (openvpn_credentials.password|length == 0)     
+
+    - name: check aws ats endpoint password
+      fail: msg="AWS_ATS_ENDPOINT is not defined"
+      when: (aws_ats.endpoint is not defined) or (aws_ats.endpoint|length == 0)  
+
+    - name: check aws thing name password
+      fail: msg="AWS_THING_NAME is not defined"
+      when: (aws_ats.name is not defined) or (aws_ats.name|length == 0)        
 
   tasks:
     - name: Install packages

@@ -28,16 +28,3 @@ for transport in ${TRANSPORTS[@]}; do
 		mv $f ${SORTED_CONF_FOLDER}/${transport}/${COUNTRY}/
 	done
 done
-
-#echo "Creating credentials files if file does not exist"
-#if [ ! -f "${CREDENTIALS}" ]; then
-#	echo "${CREDENTIALS} does not exist, creating"
-#	if [ -v NORDVPN_USER ] && [ -v NORDVPN_PASSWORD ]; then
-#		echo "${NORDVPN_USER}" >${CREDENTIALS}
-#		echo "${NORDVPN_PASSWORD}" >>${CREDENTIALS}
-#	else
-#		echo "set NORDVPN_USER and NORDVPN_PASSWORD before"
-#	fi
-#else
-#	echo "File present .. skipping credentials setting"
-#fi

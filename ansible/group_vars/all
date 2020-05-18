@@ -21,3 +21,7 @@ openvpn_credentials:
   path: "/etc/openvpn/client/nordvpn-credentials.txt"
 
 iot_vpn_lab: /opt/iot_vpn_lab
+
+aws_ats:
+  endpoint: "{{ lookup('env', 'AWS_ATS_ENDPOINT') }}"
+  name: "{{ lookup('env', 'AWS_THING_NAME') }}"
