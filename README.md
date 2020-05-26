@@ -2,7 +2,14 @@
 
 AWS IoT + Alex Skill + AWS Lambda + NordVPN + Rasperry PI WiFI Router
 
-**Objective**: use *Amazon Alexa* to control a vpn network, eveything should be done **As a Code**
+**Objective**: use *Amazon Alexa* to control a WiFi network secured by NordVPN, eveything should be done **As a Code**
+
+
+Interactions:
+
+* Alexa skill pushes a "country name" to an AWS IoT Shadow QUEUE (MQTT) [Check Alexa-Skill folder]
+* Python daemon running in a Raspberry PI consumes mesage from th e AWS IoT Shadow QUEUE [Check Service folder], creates a new openvpn configuration with servers selected using the country provided and openvpn is restarted
+
 
 ## alexa-skill
 
@@ -16,7 +23,7 @@ NodeJS code to process Alexa Skill (this will be deployed by terraform/lambda)
 
 ## service
 
-Python daemon to process messages sent by the alexa skill
+Python daemon to process messages sent by the alexa skill and restart openvpn with the new configuration
 
 ## terraform/lambda
 
