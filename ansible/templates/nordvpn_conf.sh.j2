@@ -6,10 +6,8 @@ CURL_BIN=$(which curl)
 UNZIP_BIN=$(which unzip)
 BASE_PATH="{{ iot_vpn_lab }}"
 DOWNLOAD_FOLDER="${BASE_PATH}/nordvpn"
-SORTED_CONF_FOLDER="${BASE_PATH}/sorted"
-GROUP_BY_CONF_FOLDER="${BASE_PATH}/group_by_country"
+GROUP_BY_CONF_FOLDER="${DOWNLOAD_FOLDER}/group_by_country"
 TRANSPORTS=("tcp" "udp")
-CREDENTIALS="{{ openvpn_credentials.path }}"
 
 echo "Download NORDVPN configuration files"
 ${CURL_BIN} -sLo ${DOWNLOAD_FOLDER}/ovpn.zip --create-dirs ${NORDVPN_CONF}
@@ -18,13 +16,12 @@ echo "Unzip configuration files"
 ${UNZIP_BIN} -q -o ${DOWNLOAD_FOLDER}/ovpn.zip -d ${DOWNLOAD_FOLDER}
 
 for transport in ${TRANSPORTS[@]}; do
-	FOLDER="${DOWNLOAD_FOLDER}/ovpn_${transport}/"
-	cd ${FOLDER}
-	for f in *.ovpn; do
-		COUNTRY=${f:0:2}
-		mkdir -p ${SORTED_CONF_FOLDER}/${transport}/${COUNTRY} || true
-		mkdir -p ${GROUP_BY_CONF_FOLDER}/${transport} || true
-		$(grep -i "remote " ${f} | cut -d ' ' -f2-3 >> ${GROUP_BY_CONF_FOLDER}/${transport}/servers_${COUNTRY}.txt)
-		mv $f ${SORTED_CONF_FOLDER}/${transport}/${COUNTRY}/
-	done
+    mkdir -p ${GROUP_BY_CONF_FOLDER}/${transport} || true
+    FOLDER="${DOWNLOAD_FOLDER}/ovpn_${transport}/"
+    cd ${FOLDER}
+    for f in *.ovpn; do
+        COUNTRY=${f:0:2}
+        $(grep -i "remote " ${f} | cut -d ' ' -f2-3 >>${GROUP_BY_CONF_FOLDER}/${transport}/servers_${COUNTRY}.txt)
+    done
+    cd ${DOWNLOAD_FOLDER} && rm -rf ${FOLDER} || true
 done

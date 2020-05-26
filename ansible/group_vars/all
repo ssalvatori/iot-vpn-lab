@@ -10,6 +10,7 @@ packages:
   - netfilter-persistent
   - iptables-persistent
   - iptables
+  - openvpn
 net: 10.10.0.10/24
 ssid: 
   name: "{{ lookup('env', 'SSID_NAME') }}"

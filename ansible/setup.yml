@@ -33,8 +33,16 @@
       tags:
         - iot_vpn_lab
 
-  pre_tasks:
+    - name: restart openvpn
+      listen: "iot vpn lab"
+      systemd:
+        name: openvpn@nordvpn
+        state: restarted
+        enabled: yes
+      tags:
+        - iot_vpn_lab
 
+  pre_tasks:
     - name: check ssid username
       fail: msg="SSID_NAME is not defined"
       when: (ssid.name is not defined) or (ssid.name|length == 0)
@@ -53,15 +61,15 @@
 
     - name: check nordvpn password
       fail: msg="NORDVPN_PASSWORD is not defined"
-      when: (openvpn_credentials.password is not defined) or (openvpn_credentials.password|length == 0)     
+      when: (openvpn_credentials.password is not defined) or (openvpn_credentials.password|length == 0)
 
     - name: check aws ats endpoint password
       fail: msg="AWS_ATS_ENDPOINT is not defined"
-      when: (aws_ats.endpoint is not defined) or (aws_ats.endpoint|length == 0)  
+      when: (aws_ats.endpoint is not defined) or (aws_ats.endpoint|length == 0)
 
     - name: check aws thing name password
       fail: msg="AWS_THING_NAME is not defined"
-      when: (aws_ats.name is not defined) or (aws_ats.name|length == 0)        
+      when: (aws_ats.name is not defined) or (aws_ats.name|length == 0)
 
   tasks:
     - name: Install packages
@@ -79,7 +87,7 @@
         - "{{ iot_vpn_lab }}/src"
         - "{{ iot_vpn_lab }}/nordvpn"
         - "{{ iot_vpn_lab }}/aws"
-      notify: iot_vpn_lab
+      notify: iot vpn lab
 
     - name: Copy nordvpn-conf-manager
       template:
@@ -131,7 +139,10 @@
         line: "{{ item.line }}"
         state: present
       with_items:
-        - { regexp: "^#DAEMON_CONF=\"\"$", line: "DAEMON_CONF=\"/etc/hostapd/hostapd.conf\"" }
+        - {
+            regexp: '^#DAEMON_CONF=""$',
+            line: 'DAEMON_CONF="/etc/hostapd/hostapd.conf"',
+          }
       notify:
         - restart hostapd
 

@@ -7,7 +7,7 @@ openvpn/sorted/**
 terraform.*
 
 # Ignore CLI configuration files
-.terraformrc
+.terraform
 terraform.rc
 
 .vscode
@@ -17,3 +17,4 @@ venv*
 *.zip
 ansible/files/*
 .pytest_cache
+*/certs/*
