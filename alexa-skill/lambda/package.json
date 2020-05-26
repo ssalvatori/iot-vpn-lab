@@ -1,0 +1,17 @@
+{
+  "name": "vpn-tunnel-alexa-skill",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ask-sdk-core": "^2.8.0",
+    "ask-sdk-model": "^1.28.0",
+    "aws-sdk": "^2.666.0"
+  },
+  "scripts": {
+    "start": "serverless offline -s dev",
+    "debug": "export SLS_DEBUG=* && node --inspect serverless offline -s dev"
+  }
+}

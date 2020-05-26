@@ -1,0 +1,5 @@
+[vagrant]
+localhost ansible_user=vagrant ansible_ssh_pass=vagrant
+
+[all:children]
+vagrant
